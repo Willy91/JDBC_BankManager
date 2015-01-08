@@ -2,10 +2,13 @@ package bank;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Date;
 import java.util.List;
+
+import com.mysql.jdbc.PreparedStatement;
 
 /**
  * A simple implementation of the ReservationManager interface. Each object of
@@ -28,7 +31,7 @@ public class BankManagerImpl implements BankManager {
 	    ")";
     
     private static final String CREATE_TABLE_TRANSFERS = "create table TRANSFERS (" +
-    	"id int NOT NULL AUTO INCREMENT," +
+    	"id int NOT NULL AUTO_INCREMENT," +
 	    "account_from int NOT NULL, " +
     	"account_to int NOT NULL," +
 	    "amount int NOT NULL," +
@@ -39,11 +42,21 @@ public class BankManagerImpl implements BankManager {
 	    ")";
     
     private static final String CREATE_TABLE_OPERATIONS = "create table OPERATIONS (" + 
-	    "id int NOT NULL, " +
+	    "id int NOT NULL AUTO_INCREMENT, " +
     	"amount int NOT NULL," +
     	"date DATETIME NOT NULL," +
-	    "primary key (id)" + 
+    	"account int NOT NULL," +
+	    "primary key (id)," + 
+    	"foreign key (account) references ACCOUNTS(id)"+
 	    ")";
+    
+    private static final String CREATE_TRIGGER_BALANCE = "create trigger POSITIVE_BALANCE " +
+    	"BEFORE UPDATE ON ACCOUNTS " +
+    	"FOR EACH ROW BEGIN "
+    	+ "IF (NEW.balance >= 0) THEN INSERT INTO OPERATIONS(amount,date,account) VALUES (NEW.balance - OLD.balance, CURRENT_TIMESTAMP, NEW.id); "
+    	+ "ELSE " +
+    	"SET NEW.balance = OLD.balance; END IF; END";
+    
     
     private final Connection connection;
 
@@ -65,15 +78,18 @@ public class BankManagerImpl implements BankManager {
     @Override
     public void createDB() throws SQLException {
     	Statement stmt = connection.createStatement();
-    	stmt.executeUpdate(CREATE_TABLE_ACCOUNTS);
-    	stmt.executeUpdate(CREATE_TABLE_TRANSFERS);
-    	stmt.executeUpdate(CREATE_TABLE_OPERATIONS);
+//    	stmt.executeUpdate(CREATE_TABLE_ACCOUNTS);
+//    	stmt.executeUpdate(CREATE_TABLE_TRANSFERS);
+    	//stmt.executeUpdate(CREATE_TABLE_OPERATIONS);
+    	stmt.executeUpdate(CREATE_TRIGGER_BALANCE);
     }
 
     @Override
     public boolean createAccount(int number) throws SQLException {
-	// TODO Auto-generated method stub
-	return false;
+    	
+    	Statement stmt = connection.createStatement();
+    	//if(stmt.executeUpdate("INSERT INTO ACCOUNTS VALUES (" + number + ", 0)")==1) return true;
+    	return false;
     }
 
     @Override
@@ -84,8 +100,12 @@ public class BankManagerImpl implements BankManager {
 
     @Override
     public double addBalance(int number, double amount) throws SQLException {
-	// TODO Auto-generated method stub
-	return 0;
+    	Statement stmt = connection.createStatement();
+    	stmt.executeUpdate("UPDATE ACCOUNTS SET balance=balance+"+amount+" WHERE id="+number);
+    	//ResultSet result = stmt.executeQuery("SELECT balance FROM ACCOUNTS WHERE id="+number);
+    	//result.next();
+    	//return result.getDouble(1);
+    	return 0;
     }
 
     @Override
