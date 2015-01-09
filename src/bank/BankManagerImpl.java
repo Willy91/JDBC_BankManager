@@ -97,17 +97,17 @@ public class BankManagerImpl implements BankManager {
 
     @Override
     public double getBalance(int number) throws SQLException {
-	// TODO Auto-generated method stub
-	return 0;
+    	Statement stmt = connection.createStatement();
+    	ResultSet result = stmt.executeQuery("SELECT balance FROM ACCOUNTS WHERE id="+number);
+    	result.next();
+    	return result.getDouble(1);
     }
 
     @Override
     public double addBalance(int number, double amount) throws SQLException {
     	Statement stmt = connection.createStatement();
     	stmt.executeUpdate("UPDATE ACCOUNTS SET balance=balance+"+amount+" WHERE id="+number);
-    	ResultSet result = stmt.executeQuery("SELECT balance FROM ACCOUNTS WHERE id="+number);
-    	result.next();
-    	return result.getDouble(1);
+    	return getBalance(number);
     }
 
     @Override
