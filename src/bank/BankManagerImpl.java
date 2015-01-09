@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -78,10 +79,10 @@ public class BankManagerImpl implements BankManager {
     @Override
     public void createDB() throws SQLException {
     	Statement stmt = connection.createStatement();
-//    	stmt.executeUpdate(CREATE_TABLE_ACCOUNTS);
-//    	stmt.executeUpdate(CREATE_TABLE_TRANSFERS);
+  //  	stmt.executeUpdate(CREATE_TABLE_ACCOUNTS);
+    //	stmt.executeUpdate(CREATE_TABLE_TRANSFERS);
     	//stmt.executeUpdate(CREATE_TABLE_OPERATIONS);
-    	stmt.executeUpdate(CREATE_TRIGGER_BALANCE);
+    	//stmt.executeUpdate(CREATE_TRIGGER_BALANCE);
     }
 
     @Override
@@ -111,13 +112,21 @@ public class BankManagerImpl implements BankManager {
     @Override
     public boolean transfer(int from, int to, double amount) throws SQLException {
 	// TODO Auto-generated method stub
+    	addBalance(from, -amount);
+    	addBalance(to, amount);
 	return false;
     }
 
     @Override
     public List<Operation> getOperations(int number, Date from, Date to) throws SQLException {
 	// TODO Auto-generated method stub
-	return null;
+    	List<Operation> result_list= new ArrayList<Operation>();
+    	Statement stmt = connection.createStatement();
+    	ResultSet result = stmt.executeQuery("SELECT * FROM OPERATIONS");
+    	while (result.next()) {
+			result_list.add(new Operation(result.getInt(4), result.getDouble(2), result.getDate(3)));
+		}
+	return result_list;
     }
 
 }

@@ -112,7 +112,7 @@ public class SimpleTest {
 	    
 	    // populate the database
 	    for (int i = 0; i < MAX_ACCOUNTS; i++) {
-		manager.createAccount(i + 1);
+	    	manager.createAccount(i + 1);
 	    }
 
 	    // execute single-user tests
