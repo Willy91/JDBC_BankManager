@@ -28,7 +28,7 @@ public class BankManagerImpl implements BankManager {
 	    "id int NOT NULL, " +
     	"balance int NOT NULL DEFAULT '0'," +
 	    "primary key (id)" + 
-	    ")";
+	    ");";
     
     private static final String CREATE_TABLE_TRANSFERS = "create table TRANSFERS (" +
     	"id int NOT NULL AUTO_INCREMENT," +
@@ -78,9 +78,12 @@ public class BankManagerImpl implements BankManager {
     @Override
     public void createDB() throws SQLException {
     	Statement stmt = connection.createStatement();
-//    	stmt.executeUpdate(CREATE_TABLE_ACCOUNTS);
-//    	stmt.executeUpdate(CREATE_TABLE_TRANSFERS);
-    	//stmt.executeUpdate(CREATE_TABLE_OPERATIONS);
+    	stmt.executeUpdate("drop table if exists TRANSFERS");
+    	stmt.executeUpdate("drop table if exists OPERATIONS");
+    	stmt.executeUpdate("drop table if exists ACCOUNTS");
+    	stmt.executeUpdate(CREATE_TABLE_ACCOUNTS);
+    	stmt.executeUpdate(CREATE_TABLE_TRANSFERS);
+    	stmt.executeUpdate(CREATE_TABLE_OPERATIONS);
     	stmt.executeUpdate(CREATE_TRIGGER_BALANCE);
     }
 
@@ -88,7 +91,7 @@ public class BankManagerImpl implements BankManager {
     public boolean createAccount(int number) throws SQLException {
     	
     	Statement stmt = connection.createStatement();
-    	//if(stmt.executeUpdate("INSERT INTO ACCOUNTS VALUES (" + number + ", 0)")==1) return true;
+    	if(stmt.executeUpdate("INSERT INTO ACCOUNTS VALUES (" + number + ", 0)")==1) return true;
     	return false;
     }
 
@@ -102,16 +105,15 @@ public class BankManagerImpl implements BankManager {
     public double addBalance(int number, double amount) throws SQLException {
     	Statement stmt = connection.createStatement();
     	stmt.executeUpdate("UPDATE ACCOUNTS SET balance=balance+"+amount+" WHERE id="+number);
-    	//ResultSet result = stmt.executeQuery("SELECT balance FROM ACCOUNTS WHERE id="+number);
-    	//result.next();
-    	//return result.getDouble(1);
-    	return 0;
+    	ResultSet result = stmt.executeQuery("SELECT balance FROM ACCOUNTS WHERE id="+number);
+    	result.next();
+    	return result.getDouble(1);
     }
 
     @Override
     public boolean transfer(int from, int to, double amount) throws SQLException {
-	// TODO Auto-generated method stub
-	return false;
+    	// TODO Auto-generated method stub
+    	return false;
     }
 
     @Override
