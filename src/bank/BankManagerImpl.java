@@ -8,8 +8,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import com.mysql.jdbc.PreparedStatement;
+import java.sql.Timestamp;
 
 /**
  * A simple implementation of the ReservationManager interface. Each object of
@@ -114,18 +113,23 @@ public class BankManagerImpl implements BankManager {
 
     @Override
     public boolean transfer(int from, int to, double amount) throws SQLException {
-	// TODO Auto-generated method stub
+    	double balance_from = getBalance(from);
+    	double balance_to = getBalance(to);
     	addBalance(from, -amount);
     	addBalance(to, amount);
-	return false;
+    	return getBalance(from) == balance_from-amount && getBalance(to) == balance_to+amount;
     }
 
     @Override
     public List<Operation> getOperations(int number, Date from, Date to) throws SQLException {
-	// TODO Auto-generated method stub
+    	Timestamp fromSQL = new Timestamp(from.getTime());
+    	Timestamp toSQL = new Timestamp(to.getTime());
+    	
     	List<Operation> result_list= new ArrayList<Operation>();
     	Statement stmt = connection.createStatement();
-    	ResultSet result = stmt.executeQuery("SELECT * FROM OPERATIONS");
+    	ResultSet result = stmt.executeQuery("SELECT * FROM OPERATIONS WHERE date BETWEEN '" + fromSQL
+    			+ "' AND '" + toSQL + "' AND account=" + number);
+
     	while (result.next()) {
 			result_list.add(new Operation(result.getInt(4), result.getDouble(2), result.getDate(3)));
 		}
