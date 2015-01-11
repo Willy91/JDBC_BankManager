@@ -111,29 +111,37 @@ public class BankManagerImpl implements BankManager {
     @Override
     public double addBalance(int number, double amount) throws SQLException {
     	connection.setAutoCommit(false);
-    	Statement stmt = connection.createStatement();
-    	
-    	stmt.executeUpdate("UPDATE ACCOUNTS SET balance=balance+"+amount+" WHERE id="+number);
-    	
-    	connection.commit();
+    	try{
+	    	Statement stmt = connection.createStatement();
+	    	
+	    	stmt.executeUpdate("UPDATE ACCOUNTS SET balance=balance+"+amount+" WHERE id="+number);
+	    	
+	    	connection.commit();
+    	}catch (SQLException e){
+    		connection.rollback();
+    	}
     	return getBalance(number);
     }
 
     @Override
     public boolean transfer(int from, int to, double amount) throws SQLException {
     	connection.setAutoCommit(false);
-
-    	Statement stmt = connection.createStatement();
-    	
-    	double balance_from = getBalance(from);
-    	double balance_to = getBalance(to);
-    	
-    	stmt.executeUpdate("UPDATE ACCOUNTS SET balance=balance+"+(-amount)+" WHERE id="+from);
-    	stmt.executeUpdate("UPDATE ACCOUNTS SET balance=balance+"+amount+" WHERE id="+to);
-    	connection.commit();;
+    	try{
+	    	Statement stmt = connection.createStatement();
+	    	
+	    	double balance_from = getBalance(from);
+	    	double balance_to = getBalance(to);
+	    	
+	    	stmt.executeUpdate("UPDATE ACCOUNTS SET balance=balance+"+(-amount)+" WHERE id="+from);
+	    	stmt.executeUpdate("UPDATE ACCOUNTS SET balance=balance+"+amount+" WHERE id="+to);
+	    	connection.commit();
+	    	return getBalance(from) == balance_from-amount && getBalance(to) == balance_to+amount;
+    	}catch(SQLException e){
+    		connection.rollback();
+    	}
     	//addBalance(from, -amount);
     	//addBalance(to, amount);
-    	return getBalance(from) == balance_from-amount && getBalance(to) == balance_to+amount;
+    	return false;
     }
 
     @Override

@@ -49,32 +49,20 @@ public class SimpleTest {
 	    System.out.println(this + ": starting");
 	    	    // TODO complete the test
 	    try{
+	    	manager.addBalance(1,-300);
+
 	    	double balance = manager.getBalance(1);
-	    	System.out.println(balance);
-	    	manager.addBalance(1,-10);
-	    	if(manager.getBalance(1) == balance-10){
-	    		System.out.println("Success " + customer );
-	    	}
-	    	else{
-	    		System.out.println(Double.toString(manager.getBalance(1)) + customer);
-	    	}
 	    	
-	    /*	balance = manager.getBalance(1);
 	    	double balance2 = manager.getBalance(2);
-	    	manager.transfer(1, 2, 10);
-	    	if(manager.getBalance(1)==balance-10 && manager.getBalance(2)==balance2+10){
-	    		System.out.println("success transfert");
-	    	}
-	    	else{
-	    		System.out.println("1 :"+ balance + " " + manager.getBalance(1) + "2 :" + balance2 + manager.getBalance(2) );
-	    		
-	    	}
-	    	*/
 	    	
+	    	manager.transfer(1, 3, 200);
+
+
 	    }catch(SQLException e){
 	    	e.printStackTrace();
+	    	
 	    }
-	    
+
 	    System.out.println(this + ": exiting");
 	}
 
@@ -148,8 +136,9 @@ public class SimpleTest {
 	    // execute multi-user tests
 	    for (int i = 0; i < MAX_CUSTOMERS; i++) {
 		BankManager m = new BankManagerImpl(args[0], args[1], args[2]);
-		new CustomerEmulator(m, "multi-customer" + i).start();
-	    }
+		CustomerEmulator custom = new CustomerEmulator(m, "multi-customer" + i);
+		custom.start();
+		}
 
 	} catch (Exception e) {
 	    System.err.println("test aborted: " + e);
