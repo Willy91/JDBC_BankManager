@@ -73,8 +73,7 @@ public class BankManagerImpl implements BankManager {
      */
     public BankManagerImpl(String url, String user, String password) throws SQLException {
     	connection = DriverManager.getConnection(url, user, password);
-    	//connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
-
+    	connection.setAutoCommit(false);
     }
 
     @Override
@@ -88,6 +87,7 @@ public class BankManagerImpl implements BankManager {
     	stmt.executeUpdate(CREATE_TABLE_TRANSFERS);
     	stmt.executeUpdate(CREATE_TABLE_OPERATIONS);
     	stmt.executeUpdate(CREATE_TRIGGER_BALANCE);
+    	connection.commit();
     }
 
     @Override
@@ -95,16 +95,17 @@ public class BankManagerImpl implements BankManager {
     	
     	Statement stmt = connection.createStatement();
     	if(stmt.executeUpdate("INSERT INTO ACCOUNTS VALUES (" + number + ", 0)")==1) return true;
+    	connection.commit();
     	return false;
     }
 
     @Override
     public double getBalance(int number) throws SQLException {
-    	connection.setAutoCommit(false);
     	Statement stmt = connection.createStatement();
     	ResultSet result = stmt.executeQuery("SELECT balance FROM ACCOUNTS WHERE id="+number);
     	connection.commit();
     	result.next();
+    	
     	return result.getDouble(1);
     }
 
@@ -125,23 +126,24 @@ public class BankManagerImpl implements BankManager {
 
     @Override
     public boolean transfer(int from, int to, double amount) throws SQLException {
-    	connection.setAutoCommit(false);
-    	try{
+   
 	    	Statement stmt = connection.createStatement();
 	    	
 	    	double balance_from = getBalance(from);
 	    	double balance_to = getBalance(to);
-	    	
+	    	try{
 	    	stmt.executeUpdate("UPDATE ACCOUNTS SET balance=balance+"+(-amount)+" WHERE id="+from);
 	    	stmt.executeUpdate("UPDATE ACCOUNTS SET balance=balance+"+amount+" WHERE id="+to);
+	    	}catch(SQLException e){
+	    		e.printStackTrace();
+		    	connection.rollback();
+	    	}
 	    	connection.commit();
 	    	return getBalance(from) == balance_from-amount && getBalance(to) == balance_to+amount;
-    	}catch(SQLException e){
-    		connection.rollback();
-    	}
+ 
     	//addBalance(from, -amount);
     	//addBalance(to, amount);
-    	return false;
+  
     }
 
     @Override

@@ -40,7 +40,6 @@ public class SimpleTest {
 	    manager = m;
 	    customer = c;
 	}
-
 	public String toString() {
 	    return customer + "[" + manager + "]";
 	}
@@ -53,8 +52,9 @@ public class SimpleTest {
 
 	    	double balance = manager.getBalance(1);
 	    	
-	    	double balance2 = manager.getBalance(2);
-	    	
+	    	double balance2 = manager.getBalance(3);
+	    	System.out.println(" here " + customer+ balance + " " + balance2);
+
 	    	manager.transfer(1, 3, 200);
 
 
