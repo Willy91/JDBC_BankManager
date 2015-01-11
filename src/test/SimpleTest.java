@@ -35,7 +35,7 @@ public class SimpleTest {
 
 	private BankManager manager;
 	private String customer;
-
+	private static int i = 1;
 	public CustomerEmulator(BankManager m, String c) {
 	    manager = m;
 	    customer = c;
@@ -47,7 +47,34 @@ public class SimpleTest {
 
 	public void run() {
 	    System.out.println(this + ": starting");
-	    // TODO complete the test
+	    	    // TODO complete the test
+	    try{
+	    	double balance = manager.getBalance(1);
+	    	System.out.println(balance);
+	    	manager.addBalance(1,-10);
+	    	if(manager.getBalance(1) == balance-10){
+	    		System.out.println("Success " + customer );
+	    	}
+	    	else{
+	    		System.out.println(Double.toString(manager.getBalance(1)) + customer);
+	    	}
+	    	
+	    /*	balance = manager.getBalance(1);
+	    	double balance2 = manager.getBalance(2);
+	    	manager.transfer(1, 2, 10);
+	    	if(manager.getBalance(1)==balance-10 && manager.getBalance(2)==balance2+10){
+	    		System.out.println("success transfert");
+	    	}
+	    	else{
+	    		System.out.println("1 :"+ balance + " " + manager.getBalance(1) + "2 :" + balance2 + manager.getBalance(2) );
+	    		
+	    	}
+	    	*/
+	    	
+	    }catch(SQLException e){
+	    	e.printStackTrace();
+	    }
+	    
 	    System.out.println(this + ": exiting");
 	}
 

@@ -73,6 +73,8 @@ public class BankManagerImpl implements BankManager {
      */
     public BankManagerImpl(String url, String user, String password) throws SQLException {
     	connection = DriverManager.getConnection(url, user, password);
+    	//connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+
     }
 
     @Override
@@ -98,25 +100,39 @@ public class BankManagerImpl implements BankManager {
 
     @Override
     public double getBalance(int number) throws SQLException {
+    	connection.setAutoCommit(false);
     	Statement stmt = connection.createStatement();
     	ResultSet result = stmt.executeQuery("SELECT balance FROM ACCOUNTS WHERE id="+number);
+    	connection.commit();
     	result.next();
     	return result.getDouble(1);
     }
 
     @Override
     public double addBalance(int number, double amount) throws SQLException {
+    	connection.setAutoCommit(false);
     	Statement stmt = connection.createStatement();
+    	
     	stmt.executeUpdate("UPDATE ACCOUNTS SET balance=balance+"+amount+" WHERE id="+number);
+    	
+    	connection.commit();
     	return getBalance(number);
     }
 
     @Override
     public boolean transfer(int from, int to, double amount) throws SQLException {
+    	connection.setAutoCommit(false);
+
+    	Statement stmt = connection.createStatement();
+    	
     	double balance_from = getBalance(from);
     	double balance_to = getBalance(to);
-    	addBalance(from, -amount);
-    	addBalance(to, amount);
+    	
+    	stmt.executeUpdate("UPDATE ACCOUNTS SET balance=balance+"+(-amount)+" WHERE id="+from);
+    	stmt.executeUpdate("UPDATE ACCOUNTS SET balance=balance+"+amount+" WHERE id="+to);
+    	connection.commit();;
+    	//addBalance(from, -amount);
+    	//addBalance(to, amount);
     	return getBalance(from) == balance_from-amount && getBalance(to) == balance_to+amount;
     }
 
