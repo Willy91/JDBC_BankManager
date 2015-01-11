@@ -48,12 +48,12 @@ public class SimpleTest {
 	    System.out.println(this + ": starting");
 	    	    // TODO complete the test
 	    try{
-	    	manager.addBalance(1,-300);
+	    	//manager.addBalance(1,-300);
 
 	    	double balance = manager.getBalance(1);
 	    	
 	    	double balance2 = manager.getBalance(3);
-	    	System.out.println(" here " + customer+ balance + " " + balance2);
+	    	//System.out.println(" here " + customer+ balance + " " + balance2);
 
 	    	manager.transfer(1, 3, 200);
 
